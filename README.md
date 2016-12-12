@@ -4,14 +4,9 @@ This repository contains a Docker base image based off Ubuntu 16.04 with the new
 
 ## Building the image
 
-The image should be built with the following command :
-
-```
-$ docker build --no-cache -t "dbmobilelife/docker-python-opencv" .
-```
-
-Using this tag ensure that you can push to the docker hub
-
+Use the bundled `build.sh` script. You need to have the following installed on your machine:
+ - `curl`
+ - Docker version 1.13 RC3 or newer (as the new `--squash` flag is used)
 ## Notes
 
 Most of the development dependencies are removed to keep the image layer lean, however, python-pip remains installed so inherting containers can install python packages.
