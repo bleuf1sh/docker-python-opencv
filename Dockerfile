@@ -5,7 +5,6 @@ WORKDIR /tmp/thework
 
 ARG BUILD_PACKAGES="build-essential     \
     cmake               \
-    git                 \
     gfortran            \
     libatlas-base-dev   \
     libavcodec-dev      \
@@ -41,8 +40,8 @@ RUN cd opencv-3.1.0 \
     && make install \
     && ldconfig
 
-RUN apt-get remove -y $BUILD_PACKAGES \
-    && apt-get -y autoremove  \
+RUN apt-get purge -y $BUILD_PACKAGES \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/thework/*
  
+RUN ln -s /usr/local/lib/python2.7/site-packages/cv2.so /usr/lib/cv2.so
