@@ -17,34 +17,32 @@ ARG BUILD_PACKAGES="build-essential     \
     libtiff5-dev        \
     libswscale-dev      \
     libv4l-dev          \
-    pkg-config          \
-    python2.7-dev"
-# Get all base deps
-RUN apt-get update \
-    && apt-get install -y $BUILD_PACKAGES \
-    && apt-get install -y python-pip      \
-    && pip install --upgrade pip \
-    && pip install numpy
-    
-RUN git clone https://github.com/Itseez/opencv_contrib.git \
-    && cd opencv_contrib \
-    && git checkout 3.1.0 \
-    && cd ..
-RUN git clone https://github.com/Itseez/opencv.git && cd opencv && git checkout 3.1.0
+    pkg-config          "
 
-# build the stuff!
-RUN cd opencv && mkdir build && cd build && cmake -D CMAKE_BUILD_TYPE=RELEASE \
-	-D CMAKE_INSTALL_PREFIX=/usr/local \
-	-D INSTALL_C_EXAMPLES=ON \
-	-D INSTALL_PYTHON_EXAMPLES=ON \
-	-D OPENCV_EXTRA_MODULES_PATH=/tmp/thework/opencv_contrib/modules \
-	-D BUILD_EXAMPLES=ON .. && make -j2 \ 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends $BUILD_PACKAGES \
+    && apt-get install -y --no-install-recommends python-pip python2.7-dev \
+    && pip install --upgrade pip \
+    && pip install numpy scipy
+    
+ADD temp/opencv-contrib-3.1.0.tar.gz .
+ADD temp/opencv-3.1.0.tar.gz .
+
+RUN cd opencv-3.1.0 \
+    && mkdir build \
+    && cd build \
+    && cmake -D CMAKE_BUILD_TYPE=RELEASE \
+    -D CMAKE_INSTALL_PREFIX=/usr/local \
+    -D INSTALL_C_EXAMPLES=OFF \
+    -D INSTALL_PYTHON_EXAMPLES=OFF \
+    -D OPENCV_EXTRA_MODULES_PATH=/tmp/thework/opencv_contrib-3.1.0/modules \
+    -D BUILD_EXAMPLES=OFF .. \
+    && make -j2 \
     && make install \
     && ldconfig
 
-# Clean up
 RUN apt-get remove -y $BUILD_PACKAGES \
-    && rm -rf /var/lib/apt/lists/*
-    && rm -rf /tmp/thework/* 
+    && apt-get -y autoremove  \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /tmp/thework/*
  
-# TODO Merge it all into one CMD to make the leanest possible docker layer
